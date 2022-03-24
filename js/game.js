@@ -94,7 +94,8 @@ function expandShown(board, iPos, jPos) {
                 let elCell = document.querySelector(`.cell-${i}-${j}`);
                 if (!board[i][j].isShown && !board[i][j].isMarked || (iPos === i && jPos === j)) { //if not shown or its our pos (our pos is shown by earlier func);
                     elCell.classList.remove('hidden');
-                    elCell.innerText = gBoard[i][j].minesAroundCount;
+                    if (gBoard[i][j].isMine) elCell.innerHTML = MINE;
+                    else elCell.innerText = gBoard[i][j].minesAroundCount;
                     setTimeout(() => {
                         elCell.classList.add('hidden');
                         elCell.innerText = '';
@@ -180,7 +181,7 @@ function hintClicked() {
     if (gGame.hints === 0 || gIsHintClick) return;
     let elMsgContainer = document.querySelector('.game-msg');
     if (gIsFirstClick === true) {
-        elMsgContainer.querySelector('span').innerText = 'First turn,save your hint!';
+        elMsgContainer.querySelector('span').innerText = 'First turn,save your hint!!!';
         elMsgContainer.style.display = 'block';
         setTimeout(() => {
             elMsgContainer.style.display = 'none';
@@ -191,7 +192,7 @@ function hintClicked() {
     let elHints = document.querySelector(`.hint${gGame.hints}`);
     elHints.style.display = 'none';
     gGame.hints--;
-    elMsgContainer.querySelector('span').innerText = 'Using Hint?!!';
+    elMsgContainer.querySelector('span').innerText = 'Using Hint?!!!';
     elMsgContainer.style.display = 'block';
 }
 
