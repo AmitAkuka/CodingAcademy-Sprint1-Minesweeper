@@ -180,3 +180,40 @@ footer {
 .hint-cursor {
     cursor: crosshair;
 }
+
+.score-container {
+    position: absolute;
+    font-family: cursive;
+    right: 5%;
+    top: 16%;
+    height: 200px;
+    width: 380px;
+    background-color: orangered;
+    border: 5px solid white;
+    text-align: center;
+    line-height: 36px;
+}
+
+.game-timer {
+    top: 6%;
+    background-color: orangered;
+    position: absolute;
+    height: 80px;
+    width: 220px;
+    left: 79%;
+    border: 5px solid white;
+    text-align: center;
+    font-family: cursive;
+    font-size: 30px;
+    line-height: 80px;
+    transition: all ease-in-out 0.5s;
+}
+
+.best-score span {
+    font-size: 50px;
+    color: yellow;
+}
+
+.current-score span {
+    color: white;
+}

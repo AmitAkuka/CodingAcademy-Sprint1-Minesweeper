@@ -13,10 +13,16 @@ function renderBoard(board, selector) {
     elContainer.innerHTML = strHTML;
 }
 
-// location such as: {i: 2, j: 7}
-function renderCell(location, value) {
-    // Select the elCell and set the value
-    let elCell = document.querySelector(`.cell-${location.i}-${location.j}`);
+//hide context menu.
+const noContext = document.querySelector('.game-table');
+
+noContext.addEventListener('contextmenu', e => {
+    e.preventDefault();
+});
+
+
+function renderCell(i, j, value) {
+    let elCell = document.querySelector(`.cell-${i}-${j}`);
     elCell.innerHTML = value;
 }
 
