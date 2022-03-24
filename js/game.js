@@ -178,11 +178,19 @@ function restartGame() {
 
 function hintClicked() {
     if (gGame.hints === 0 || gIsHintClick) return;
+    let elMsgContainer = document.querySelector('.game-msg');
+    if (gIsFirstClick === true) {
+        elMsgContainer.querySelector('span').innerText = 'First turn,save your hint!';
+        elMsgContainer.style.display = 'block';
+        setTimeout(() => {
+            elMsgContainer.style.display = 'none';
+        }, 1500);
+        return;
+    }
     gIsHintClick = true;
     let elHints = document.querySelector(`.hint${gGame.hints}`);
     elHints.style.display = 'none';
     gGame.hints--;
-    let elMsgContainer = document.querySelector('.game-msg');
     elMsgContainer.querySelector('span').innerText = 'Using Hint?!!';
     elMsgContainer.style.display = 'block';
 }

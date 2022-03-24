@@ -110,7 +110,8 @@ footer {
     font-weight: bold;
     font-family: cursive;
     position: absolute;
-    top: 39%;
+    width: 240px;
+    top: 35%;
     left: 51%;
     transform: translate(-50%, -50%);
 }
