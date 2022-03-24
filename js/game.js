@@ -76,22 +76,16 @@ function cellClicked(cell, elCell, i, j) {
         checkUserLives();
     } else {
         gGame.shownCount++;
+        elCell.innerText = gBoard[i][j].minesAroundCount;
         expandShown(gBoard, i, j);
         if ((gLevel.SIZE ** 2 - gLevel.MINE) === gGame.shownCount) checkGameOver(elCell);
     }
 }
 
-function checkUserLives() {
-    let elLive = document.querySelector(`.live${gGame.lives}`);
-    gGame.markedCount++; //count mines as marked
-    gGame.lives--;
-    elLive.style.display = 'none';
-    if (gGame.lives !== 0) blockAudio.play();
-    checkGameOver();
-}
-
 
 function expandShown(board, iPos, jPos) {
+    let positions = [];
+    let pos = null;
     for (let i = iPos - 1; i <= iPos + 1; i++) {
         if (i < 0 || i > board.length - 1) continue;
         for (let j = jPos - 1; j <= jPos + 1; j++) {
@@ -99,23 +93,30 @@ function expandShown(board, iPos, jPos) {
             if (gIsHintClick) {
                 let elCell = document.querySelector(`.cell-${i}-${j}`);
                 if (!board[i][j].isShown && !board[i][j].isMarked || (iPos === i && jPos === j)) { //if not shown or its our pos (our pos is shown by earlier func);
-                    elCell.classList.remove('hidden');
-                    if (gBoard[i][j].isMine) elCell.innerHTML = MINE;
-                    else elCell.innerText = gBoard[i][j].minesAroundCount;
-                    setTimeout(() => {
-                        elCell.classList.add('hidden');
-                        elCell.innerText = '';
-                        gIsProcessing = false;
-                    }, 1000);
+                    showHint(elCell, i, j);
                 }
             } else if (!board[i][j].isMine && !board[i][j].isMarked) {
-                if (!board[i][j].isShown) gGame.shownCount++;
-                let elCell = document.querySelector(`.cell-${i}-${j}`);
-                gBoard[i][j].isShown = true;
-                elCell.classList.remove('hidden');
-                elCell.innerText = gBoard[i][j].minesAroundCount;
+                pos = {
+                    i: i,
+                    j: j
+                }
+                positions.push(pos);
             }
         }
+    }
+    checkNeighbors(positions, board)
+}
+
+function checkNeighbors(positions, board) {
+    if (positions.length !== 9) return;
+    for (let i = 0; i < positions.length; i++) {
+        let iPos = positions[i].i;
+        let jPos = positions[i].j;
+        if (!board[iPos][jPos].isShown) gGame.shownCount++;
+        let elCell = document.querySelector(`.cell-${iPos}-${jPos}`);
+        gBoard[iPos][jPos].isShown = true;
+        elCell.classList.remove('hidden');
+        elCell.innerText = gBoard[iPos][jPos].minesAroundCount;
     }
 }
 
@@ -141,6 +142,14 @@ function changeDifficulty(elBtn) {
     restartGame();
 }
 
+function checkUserLives() {
+    let elLive = document.querySelector(`.live${gGame.lives}`);
+    gGame.markedCount++; //count mines as marked
+    gGame.lives--;
+    elLive.style.display = 'none';
+    if (gGame.lives !== 0) blockAudio.play();
+    checkGameOver();
+}
 
 function checkGameOver() {
     let elMsgContainer = document.querySelector('.game-msg');
@@ -163,6 +172,7 @@ function checkGameOver() {
 }
 
 function restartGame() {
+    clearInterval(gTimerIntervalId);
     gIsFirstClick = true;
     gIsTimerRunning = false;
     let elMsgContainer = document.querySelector('.game-msg');
@@ -183,37 +193,6 @@ function restartGame() {
     gMinesPosition = [];
     initGame();
 }
-
-function hintClicked() {
-    console.log('clicked');
-    if (gGame.hints === 0 || gIsHintClick) return;
-    let elMsgContainer = document.querySelector('.game-msg');
-    if (gIsFirstClick === true) {
-        elMsgContainer.querySelector('span').innerText = 'First turn,save your hint!!!';
-        elMsgContainer.style.display = 'block';
-        setTimeout(() => {
-            elMsgContainer.style.display = 'none';
-        }, 1500);
-        return;
-    }
-    gIsHintClick = true;
-    let elHints = document.querySelector(`.hint${gGame.hints}`);
-    elHints.style.display = 'none';
-    gGame.hints--;
-    elMsgContainer.querySelector('span').innerText = 'Using Hint?!!!';
-    elMsgContainer.style.display = 'block';
-}
-
-function checkHint(cell, iPos, jPos) {
-    gIsProcessing = true;
-    expandShown(gBoard, iPos, jPos);
-    cell.isShown = false;
-    let elMsgContainer = document.querySelector('.game-msg');
-    elMsgContainer.style.display = 'none';
-    gIsHintClick = false;
-}
-
-
 
 function handleFirstClick(cell) {
     cell.isShown = true;

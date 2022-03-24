@@ -14,6 +14,7 @@ function setMinesOnBoard(board) {
 }
 
 function getNoMinePositions(board) {
+    console.log(board);
     let freePositions = [];
     let freePos = null;
     for (let i = 0; i < board.length; i++) {
