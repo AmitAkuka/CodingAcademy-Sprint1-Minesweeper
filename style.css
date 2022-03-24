@@ -1,0 +1,181 @@
+body {
+    background-color: darkorange;
+    /* background-image: url('img/background.png'); */
+    user-select: none;
+    margin: 0;
+}
+
+.game-title,
+img {
+    margin: auto;
+    padding: 2px;
+    height: 140px;
+    width: 400px;
+}
+
+.game-title img {
+    border-bottom: 8px solid white;
+}
+
+.game-table {
+    margin: auto;
+    margin-top: 55px;
+    text-align: center;
+    border-collapse: collapse;
+    border: 5px solid black;
+    background-color: gainsboro;
+}
+
+.cell {
+    height: 45px;
+    width: 45px;
+    border: 2px solid black;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    transition: all ease-in 0.5s;
+}
+
+.cell img {
+    width: 20px;
+    height: 20px;
+}
+
+.hidden {
+    background-color: orangered;
+}
+
+.game-difficlty {
+    text-align: center;
+    margin-top: 60px;
+}
+
+footer {
+    position: absolute;
+    bottom: 0;
+    height: 35px;
+    width: 100%;
+    text-align: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background: #000;
+    font-size: 15px;
+    color: white;
+}
+
+.game-btns {
+    text-align: center;
+    height: 5px;
+    margin-top: 120px;
+}
+
+.difficulty-btn {
+    height: 30px;
+    width: 95px;
+    font-family: sans-serif;
+    font-weight: bold;
+    background-color: coral;
+    border: 3px solid black;
+    border-radius: 20px;
+    box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+}
+
+.selected-btn {
+    background-color: orangered;
+}
+
+.hidden:hover,
+.difficulty-btn:hover {
+    background-color: darkorange;
+    cursor: pointer;
+    transition: all ease-in 0.2s;
+}
+
+.game-wrapper {
+    position: relative;
+}
+
+.game-msg {
+    position: absolute;
+    right: 204px;
+    top: 415px;
+    display: none;
+}
+
+.game-msg img {
+    transform: scaleX(-1);
+}
+
+.game-msg span {
+    font-size: 2rem;
+    font-weight: bold;
+    font-family: cursive;
+    position: absolute;
+    top: 39%;
+    left: 51%;
+    transform: translate(-50%, -50%);
+}
+
+.buu-character {
+    height: 400px;
+    width: 300px;
+    position: absolute;
+    right: 50px;
+    bottom: 50px;
+}
+
+.restart-game {
+    height: 100px;
+    width: 100px;
+    position: absolute;
+    right: 47.5%;
+    margin-top: 15px;
+}
+
+.goku-character {
+    height: 450px;
+    position: absolute;
+    left: 55px;
+    top: 35px;
+    transform: scaleX(-1) rotate(35deg);
+    width: 350px;
+}
+
+.spiritbomb-goku {
+    height: 150px;
+    position: absolute;
+    left: 270px;
+    width: 160px;
+    top: 280px;
+}
+
+.game-info {
+    position: absolute;
+    height: 100px;
+    width: 600px;
+    left: 35%;
+    top: 160px;
+    line-height: 100px;
+    font-family: cursive;
+    font-size: 2rem;
+}
+
+.lives-info,
+.hints-info {
+    width: 190px;
+}
+
+.hints-info {
+    position: absolute;
+    left: 65%;
+    top: 0px;
+}
+
+.game-info img {
+    height: 50px;
+    width: 25px;
+    margin-bottom: -18px;
+}
+
+.hint-cursor {
+    cursor: crosshair;
+}

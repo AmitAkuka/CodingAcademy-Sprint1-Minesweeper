@@ -1,0 +1,51 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" type="image/x-icon" href="img/faviconv2.png">
+    <title>MineSweeper</title>
+</head>
+
+<body onload="initGame()">
+    <div class="game-title"><img src="img/newTitle.png"></div>
+    <img class="goku-character" src="img/gokuSpirit.png">
+    <img class="spiritbomb-goku" src="img/spiritBomb.png">
+    <img class="buu-character" src="img/kidBuu.png">
+
+    <div class="game-msg">
+        <img src="img/message.png">
+        <span></span>
+    </div>
+    <div class="game-info">
+        <div class="lives-info">
+            <span>Lives: <img class="lives live1" src="img/live.png"><img class="lives live2" src="img/live.png"><img class="lives live3" src="img/live.png">
+            </span>
+        </div>
+        <div class="hints-info">
+            <span>Hints: <img class="hints hint1" onclick="hintClicked()" src="img/potaraHint.png"><img class="hints hint2" onclick="hintClicked()" src="img/potaraHint.png"><img class="hints hint3" onclick="hintClicked()" src="img/potaraHint.png">
+            </span>
+        </div>
+    </div>
+    <img class="restart-game" onclick="restartGame()" src="img/normalBuu.png">
+
+
+    <div class="game-btns">
+        <button class="difficulty-btn selected-btn" data-size="4" data-mine="2" onclick="changeDifficulty(this)">Beginner</button>
+        <button class="difficulty-btn" data-size="8" data-mine="12" onclick="changeDifficulty(this)">Medium</button>
+        <button class="difficulty-btn" data-size="12" data-mine="30" onclick="changeDifficulty(this)">Expert</button>
+    </div>
+    <table class="game-table">
+
+    </table>
+
+    <script src="js/util.js"></script>
+    <script src="js/mines.js"></script>
+    <script src="js/game.js"></script>
+</body>
+<footer>Made with <i class="fa fa-lg fa-code"></i> by Amit Akuka</footer>
+
+</html>
