@@ -11,8 +11,11 @@ let gIsFirstClick = true;
 let gIsHintClick = false;
 let gIsTimerRunning = false;
 let gIsProcessing = false; //avoid user clicking too fast
-let gTimerIntervalId;
+let gIsManualMode = false;
+let gGameSteps = [];
+let gUserMinesPositions = [];
 let gBestScore = 0;
+let gTimerIntervalId;
 let gBoard;
 let gLevel = {
     SIZE: 4,
@@ -26,7 +29,9 @@ let gGame = {
     secsPassed: 0,
     lives: 3,
     hints: 3,
-    score: 0
+    score: 0,
+    safeClick: 3,
+    manuallyPlacedMines: 0
 }
 
 function initGame() {
@@ -48,7 +53,8 @@ function buildBoard() {
                 minesAroundCount: 0,
                 isShown: false,
                 isMine: false,
-                isMarked: false
+                isMarked: false,
+                isCalculated: false
             }
             board[i][j] = cell;
         }
@@ -60,13 +66,16 @@ function handleClick(event, elCell, i, j) {
     let cell = gBoard[i][j];
     if (!gGame.isOn || cell.isShown) return;
     let startTS = Date.now();
-    if (!gIsTimerRunning) startTimer(startTS);
+    if (!gIsTimerRunning && !gIsManualMode) startTimer(startTS); //if timer is running or user in manual mode dont run
     if (event.button === 0) cellClicked(cell, elCell, i, j); //left click
     else if (event.button === 2) cellMark(cell, elCell); //right click
 }
 
 function cellClicked(cell, elCell, i, j) {
-    if (gIsFirstClick) {
+    if (gIsManualMode && gGame.manuallyPlacedMines !== gLevel.MINE) {
+        setMinesManually(i, j);
+        return;
+    } else if (gIsFirstClick) {
         handleFirstClick(cell, i, j);
         return;
     } else if (cell.isMarked || gIsProcessing) return;
@@ -77,12 +86,13 @@ function cellClicked(cell, elCell, i, j) {
     cell.isShown = true;
     elCell.classList.remove('hidden');
     if (cell.isMine) {
+        gGameSteps.push([{ i: i, j: j }]);
         elCell.innerHTML = PRESSED_MINE;
-        userScore(-5); //mine is -150 points.
+        userScore(-5, cell); //mine is -150 points.
         checkUserLives();
     } else {
-        elCell.innerText = cell.minesAroundCount;
-        userScore(cell.minesAroundCount);
+        renderCell({ i: i, j: j }, cell.minesAroundCount);
+        userScore(cell.minesAroundCount, cell);
         gGame.shownCount++;
         //only if we clicked on cell with no neighboors call expand shown.
         if (cell.minesAroundCount === 0) expandShown(gBoard, i, j);
@@ -93,10 +103,18 @@ function cellClicked(cell, elCell, i, j) {
 function handleFirstClick(cell, i, j) {
     cell.isShown = true;
     gGame.shownCount++;
-    setMinesOnBoard(gBoard);
+    if (gIsManualMode) {
+        //set mines that user chose
+        for (let i = 0; i < gMinesPosition.length; i++) {
+            let iPos = gMinesPosition[i].i;
+            let jPos = gMinesPosition[i].j;
+            gBoard[iPos][jPos].isMine = true;
+        }
+    } else setMinesOnBoard(gBoard);
     setMinesNegsCount(gBoard);
     renderCell({ i: i, j: j }, cell.minesAroundCount);
-    userScore(cell.minesAroundCount);
+    userScore(cell.minesAroundCount, cell); //update first clicked cell
+    if (cell.minesAroundCount === 0) expandShown(gBoard, i, j); //check neighboors after first click.
     gIsFirstClick = false;
 }
 
@@ -120,7 +138,7 @@ function expandShown(board, iPos, jPos) {
                 if (cell.isMine || cell.isMarked || cell.isShown) continue;
                 cell.isShown = true;
                 gGame.shownCount++;
-                userScore(cell.minesAroundCount);
+                userScore(cell.minesAroundCount, cell);
                 //if its 0 (no mines close to him - call func again with his position).
                 if (cell.minesAroundCount === 0) {
                     expandShown(board, i, j);
@@ -188,6 +206,7 @@ function restartGame() {
     clearInterval(gTimerIntervalId);
     gIsFirstClick = true;
     gIsTimerRunning = false;
+    gIsManualMode = false;
     let elMsgContainer = document.querySelector('.game-msg');
     elMsgContainer.style.display = 'none';
     let elRestartContainer = document.querySelector('.restart-game');
@@ -199,16 +218,48 @@ function restartGame() {
     }
     let elPlayerScore = document.querySelector('.current-score span');
     elPlayerScore.innerText = 0;
+    let elSetMinesBtn = document.querySelector('.setmines-click');
+    elSetMinesBtn.innerText = 'Set mines manually OFF';
     gGame.shownCount = 0;
     gGame.markedCount = 0;
     gGame.secsPassed = 0;
     gGame.lives = 3;
     gGame.hints = 3;
+    gGame.safeClick = 3;
     gGame.score = 0;
+    gGame.manuallyPlacedMines = 0;
+    document.querySelector('.safe-click span').innerText = gGame.safeClick;
+    gGameSteps = [];
     gMinesPosition = [];
+    gUserMinesPositions = [];
     initGame();
 }
 
+function safeClick() {
+    if (!gGame.isOn || gIsFirstClick || gGame.safeClick === 0 ||
+        (gLevel.SIZE ** 2 - gLevel.MINE) === gGame.shownCount) return; //all free of mines cells are shown already.
+    gGame.safeClick--;
+    let elMsgContainer = document.querySelector('.game-msg');
+    elMsgContainer.querySelector('span').innerText = `Need help goku? 😂`;
+    elMsgContainer.style.display = 'block';
+    setTimeout(() => { elMsgContainer.style.display = 'none'; }, 2000);
+    let elSafeBtn = document.querySelector('.safe-click span');
+    elSafeBtn.innerText = gGame.safeClick;
+    let freePositions = getNoMinePositions(gBoard);
+    let randomNum = getRandomNum(freePositions.length);
+    let freePos = freePositions[randomNum];
+    let elCell = document.querySelector(`.cell-${freePos.i}-${freePos.j}`);
+    elCell.classList.add('cellHighlight');
+    setTimeout(() => {
+        elCell.classList.remove('cellHighlight');
+    }, 3000);
+}
+
+function gameUndo() {
+    if (!gGame.isOn || gIsFirstClick || gGameSteps.length === 0) return;
+    let lastGameStep = gGameSteps.pop();
+    reverseRenderCell(...lastGameStep);
+}
 
 function checkUserScore() {
     if (gGame.score > gBestScore || !gBestScore) {
@@ -217,7 +268,9 @@ function checkUserScore() {
     }
 }
 
-function userScore(num) {
+function userScore(num, cell) {
+    if (cell.isCalculated) return; //incase of undo - dont count this cell!
+    cell.isCalculated = true;
     let scoreNum = 100 + num * 50;
     gGame.score += scoreNum;
     let elPlayerScore = document.querySelector('.current-score span');
@@ -233,6 +286,28 @@ function getBestScore() {
     } else {
         gBestScore = localStorage.getItem(`BestScore${gLevel.SIZE}`);
         elBestScore.innerText = gBestScore;
+    }
+}
+
+function setMinesManually(i, j) {
+    let elMsgContainer = document.querySelector('.game-msg');
+    if (!gGame.isOn || gMinesPosition.length === gLevel.MINE) return;
+    else if (!gIsManualMode) {
+        gIsManualMode = true;
+        let elSetMinesBtn = document.querySelector('.setmines-click');
+        elSetMinesBtn.innerText = 'Set mines manually ON';
+        elMsgContainer.querySelector('span').innerText = `PLACE ${gLevel.MINE} MINES!`;
+        elMsgContainer.style.display = 'block';
+    } else if (gIsManualMode) {
+        if (gUserMinesPositions.includes(`${i}${j}`)) return;
+        gUserMinesPositions.push(`${i}${j}`);
+        gGame.manuallyPlacedMines++;
+        gMinesPosition.push({ i: i, j: j });
+        elMsgContainer.querySelector('span').innerText = `PLACE ${gLevel.MINE-gMinesPosition.length} MINES!`;
+        if (gMinesPosition.length === gLevel.MINE) {
+            elMsgContainer.querySelector('span').innerText = `Time to play!`;
+            setTimeout(() => { elMsgContainer.style.display = 'none'; }, 1500);
+        }
     }
 }
 

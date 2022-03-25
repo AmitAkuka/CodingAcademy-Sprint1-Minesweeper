@@ -22,9 +22,18 @@ noContext.addEventListener('contextmenu', e => {
 
 //
 function renderCell(pos, value) {
+    gGameSteps.push([{ i: pos.i, j: pos.j }]);
     let elCell = document.querySelector(`.cell-${pos.i}-${pos.j}`);
     elCell.classList.remove('hidden');
     elCell.innerText = value;
+}
+
+function reverseRenderCell(pos) {
+    let elCell = document.querySelector(`.cell-${pos.i}-${pos.j}`);
+    gBoard[pos.i][pos.j].isShown = false;
+    gGame.shownCount--;
+    elCell.classList.add('hidden');
+    elCell.innerText = '';
 }
 
 function getRandomNum(num) {

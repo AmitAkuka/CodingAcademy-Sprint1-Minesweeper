@@ -61,7 +61,7 @@ footer {
 .game-btns {
     position: absolute;
     text-align: center;
-    left: 42.4%;
+    left: 35.9%;
     top: 30%;
 }
 
@@ -227,4 +227,36 @@ footer {
     transform: rotate(339deg);
     top: -3%;
     left: -2%;
+}
+
+.safe-click,
+.undo-click {
+    height: 40px;
+    border: 3px solid black;
+    font-family: cursive;
+    font-weight: bold;
+    background-color: red;
+    width: 120px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.safe-click:hover,
+.undo-click:hover {
+    background-color: coral;
+}
+
+.cellHighlight {
+    background-color: gold;
+}
+
+.setmines-click {
+    height: 40px;
+    border: 3px solid black;
+    font-family: cursive;
+    font-weight: bold;
+    background-color: red;
+    width: 200px;
+    font-size: 15px;
+    cursor: pointer;
 }
