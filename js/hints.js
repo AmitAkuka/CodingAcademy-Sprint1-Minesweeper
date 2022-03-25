@@ -1,5 +1,5 @@
 function hintClicked() {
-    if (gGame.hints === 0 || gIsHintClick) return;
+    if (gGame.hints === 0 || gIsHintClick || !gGame.isOn) return;
     let elMsgContainer = document.querySelector('.game-msg');
     if (gIsFirstClick === true) {
         elMsgContainer.querySelector('span').innerText = 'First turn,save your hint!!!';
@@ -17,6 +17,15 @@ function hintClicked() {
     elMsgContainer.style.display = 'block';
 }
 
+function checkHint(cell, iPos, jPos) {
+    gIsProcessing = true;
+    expandShown(gBoard, iPos, jPos);
+    cell.isShown = false;
+    let elMsgContainer = document.querySelector('.game-msg');
+    elMsgContainer.style.display = 'none';
+    gIsHintClick = false;
+}
+
 function showHint(elCell, i, j) {
     elCell.classList.remove('hidden');
     if (gBoard[i][j].isMine) elCell.innerHTML = MINE;
@@ -26,13 +35,4 @@ function showHint(elCell, i, j) {
         elCell.innerText = '';
         gIsProcessing = false;
     }, 1000);
-}
-
-function checkHint(cell, iPos, jPos) {
-    gIsProcessing = true;
-    expandShown(gBoard, iPos, jPos);
-    cell.isShown = false;
-    let elMsgContainer = document.querySelector('.game-msg');
-    elMsgContainer.style.display = 'none';
-    gIsHintClick = false;
 }

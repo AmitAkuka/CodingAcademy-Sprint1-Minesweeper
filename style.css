@@ -217,3 +217,12 @@ footer {
 .current-score span {
     color: white;
 }
+
+.goku-aura {
+    position: absolute;
+    height: 575px;
+    width: 540px;
+    transform: rotate(339deg);
+    top: -3%;
+    left: -2%;
+}

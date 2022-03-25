@@ -2,6 +2,9 @@
 
 const MINE = `<img src="img/ball.png">`;
 const PRESSED_MINE = `<img src="img/blowed-ball.png">`;
+const NOMRAL_BUU = 'img/normalBuu.png';
+const WIN_BUU = 'img/winningBuu.png';
+const ANGRY_BUU = 'img/angryBuu.png';
 const MARK = '🚩';
 
 let gIsFirstClick = true;
@@ -9,6 +12,7 @@ let gIsHintClick = false;
 let gIsTimerRunning = false;
 let gIsProcessing = false; //avoid user clicking too fast
 let gTimerIntervalId;
+let gBestScore = 0;
 let gBoard;
 let gLevel = {
     SIZE: 4,
@@ -29,8 +33,7 @@ function initGame() {
     gBoard = buildBoard();
     renderBoard(gBoard, '.game-table');
     document.querySelector('.game-timer').innerText = '00:00';
-    let elBestScore = document.querySelector('.best-score span');
-    elBestScore.innerText = localStorage.getItem(`BestScore${gLevel.SIZE}`);
+    getBestScore();
     gGame.isOn = true;
 }
 
@@ -54,17 +57,17 @@ function buildBoard() {
 }
 
 function handleClick(event, elCell, i, j) {
-    if (!gGame.isOn) return;
+    let cell = gBoard[i][j];
+    if (!gGame.isOn || cell.isShown) return;
     let startTS = Date.now();
     if (!gIsTimerRunning) startTimer(startTS);
-    let cell = gBoard[i][j];
     if (event.button === 0) cellClicked(cell, elCell, i, j); //left click
     else if (event.button === 2) cellMark(cell, elCell); //right click
 }
 
 function cellClicked(cell, elCell, i, j) {
-    if (cell.isShown || cell.isMarked || gIsProcessing) return;
-    if (gIsFirstClick) handleFirstClick(cell);
+    if (cell.isMarked || gIsProcessing) return;
+    else if (gIsFirstClick) handleFirstClick(cell);
     else if (gIsHintClick) {
         checkHint(cell, i, j);
         return;
@@ -73,56 +76,53 @@ function cellClicked(cell, elCell, i, j) {
     elCell.classList.remove('hidden');
     if (cell.isMine) {
         elCell.innerHTML = PRESSED_MINE;
+        userScore(-5); //mine is -150 points.
         checkUserLives();
     } else {
+        elCell.innerText = cell.minesAroundCount;
+        userScore(cell.minesAroundCount);
         gGame.shownCount++;
-        elCell.innerText = gBoard[i][j].minesAroundCount;
-        expandShown(gBoard, i, j);
+        //only if we clicked on cell with no neighboors call expand shown.
+        if (cell.minesAroundCount === 0) expandShown(gBoard, i, j);
         if ((gLevel.SIZE ** 2 - gLevel.MINE) === gGame.shownCount) checkGameOver(elCell);
     }
 }
 
-
 function expandShown(board, iPos, jPos) {
-    let positions = [];
-    let pos = null;
-    for (let i = iPos - 1; i <= iPos + 1; i++) {
+    for (var i = iPos - 1; i <= iPos + 1; i++) {
         if (i < 0 || i > board.length - 1) continue;
-        for (let j = jPos - 1; j <= jPos + 1; j++) {
+        for (var j = jPos - 1; j <= jPos + 1; j++) {
             if (j < 0 || j > board[0].length - 1) continue;
+            let cell = board[i][j];
+            //check if its an hint click
             if (gIsHintClick) {
+                //we skip shown and marked cells.
+                //we dont want here to skip our clicked cell.
+                if (cell.isShown || cell.isMarked) continue;
                 let elCell = document.querySelector(`.cell-${i}-${j}`);
-                if (!board[i][j].isShown && !board[i][j].isMarked || (iPos === i && jPos === j)) { //if not shown or its our pos (our pos is shown by earlier func);
-                    showHint(elCell, i, j);
+                showHint(elCell, i, j)
+            } else {
+                //skip our cell which is already updated.
+                if (i === iPos && j === jPos) continue;
+                //if cell is not a mine/marked/shown
+                if (cell.isMine || cell.isMarked || cell.isShown) continue;
+                cell.isShown = true;
+                gGame.shownCount++;
+                userScore(cell.minesAroundCount);
+                //if its 0 (no mines close to him - call func again with his position).
+                if (cell.minesAroundCount === 0) {
+                    expandShown(board, i, j);
+                    renderCell({ i: i, j: j }, 0);
+                } else {
+                    renderCell({ i: i, j: j }, cell.minesAroundCount);
                 }
-            } else if (!board[i][j].isMine && !board[i][j].isMarked) {
-                pos = {
-                    i: i,
-                    j: j
-                }
-                positions.push(pos);
             }
         }
-    }
-    checkNeighbors(positions, board)
-}
-
-function checkNeighbors(positions, board) {
-    if (positions.length !== 9) return;
-    for (let i = 0; i < positions.length; i++) {
-        let iPos = positions[i].i;
-        let jPos = positions[i].j;
-        if (!board[iPos][jPos].isShown) gGame.shownCount++;
-        let elCell = document.querySelector(`.cell-${iPos}-${jPos}`);
-        gBoard[iPos][jPos].isShown = true;
-        elCell.classList.remove('hidden');
-        elCell.innerText = gBoard[iPos][jPos].minesAroundCount;
     }
 }
 
 
 function cellMark(cell, elCell) {
-    if (cell.isShown) return;
     cell.isMarked = (cell.isMarked) ? false : true;
     gGame.markedCount += (cell.isMarked) ? 1 : -1;
     elCell.innerText = (cell.isMarked) ? MARK : '';
@@ -156,16 +156,17 @@ function checkGameOver() {
     let elRestartContainer = document.querySelector('.restart-game');
     if (gLevel.MINE === gGame.markedCount && (gLevel.SIZE ** 2 - gLevel.MINE) === gGame.shownCount) {
         gGame.isOn = false;
+        checkUserScore();
         elMsgContainer.querySelector('span').innerText = 'YOU WON!';
         elMsgContainer.style.display = 'block';
-        elRestartContainer.src = 'img/winningBuu.png';
+        elRestartContainer.src = WIN_BUU;
         clearInterval(gTimerIntervalId);
     } else if (gGame.lives === 0) {
         blowAudio.play();
         gGame.isOn = false;
         elMsgContainer.querySelector('span').innerText = 'YOU LOST!';
         elMsgContainer.style.display = 'block';
-        elRestartContainer.src = 'img/angryBuu.png';
+        elRestartContainer.src = ANGRY_BUU;
         clearInterval(gTimerIntervalId);
         viewMinesOnBoard();
     }
@@ -178,12 +179,14 @@ function restartGame() {
     let elMsgContainer = document.querySelector('.game-msg');
     elMsgContainer.style.display = 'none';
     let elRestartContainer = document.querySelector('.restart-game');
-    elRestartContainer.src = 'img/normalBuu.png';
+    elRestartContainer.src = NOMRAL_BUU;
     //reset hints and lives
     let elLivesAndHints = document.querySelectorAll('.lives,.hints');
     for (let i = 0; i < elLivesAndHints.length; i++) {
         elLivesAndHints[i].style.display = 'inline-block';
     }
+    let elPlayerScore = document.querySelector('.current-score span');
+    elPlayerScore.innerText = 0;
     gGame.shownCount = 0;
     gGame.markedCount = 0;
     gGame.secsPassed = 0;
@@ -201,11 +204,30 @@ function handleFirstClick(cell) {
     gIsFirstClick = false;
 }
 
+function checkUserScore() {
+    if (gGame.score > gBestScore || !gBestScore) {
+        localStorage.setItem(`BestScore${gLevel.SIZE}`, gGame.score);
+        getBestScore();
+    }
+}
 
 function userScore(num) {
-    let elPlayerScore = document.querySelector('.current-score');
-    gGame.score += num;
+    let scoreNum = 100 + num * 50;
+    gGame.score += scoreNum;
+    let elPlayerScore = document.querySelector('.current-score span');
     elPlayerScore.innerText = gGame.score;
+}
+
+function getBestScore() {
+    let elBestScore = document.querySelector('.best-score span');
+    let currentScore = localStorage.getItem(`BestScore${gLevel.SIZE}`);
+    if (!currentScore) {
+        gBestScore = 0;
+        elBestScore.innerText = 'No record';
+    } else {
+        gBestScore = localStorage.getItem(`BestScore${gLevel.SIZE}`);
+        elBestScore.innerText = gBestScore;
+    }
 }
 
 function startTimer(startTS) {

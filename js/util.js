@@ -20,10 +20,11 @@ noContext.addEventListener('contextmenu', e => {
     e.preventDefault();
 });
 
-
-function renderCell(i, j, value) {
-    let elCell = document.querySelector(`.cell-${i}-${j}`);
-    elCell.innerHTML = value;
+//
+function renderCell(pos, value) {
+    let elCell = document.querySelector(`.cell-${pos.i}-${pos.j}`);
+    elCell.classList.remove('hidden');
+    elCell.innerText = value;
 }
 
 function getRandomNum(num) {
