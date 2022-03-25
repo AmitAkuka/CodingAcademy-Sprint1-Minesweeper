@@ -6,6 +6,7 @@ const NOMRAL_BUU = 'img/normalBuu.png';
 const WIN_BUU = 'img/winningBuu.png';
 const ANGRY_BUU = 'img/angryBuu.png';
 const MARK = '🚩';
+const undoAudio = new Audio('sound/gokuTeleport.mp3');
 
 let gIsFirstClick = true;
 let gIsHintClick = false;
@@ -259,6 +260,7 @@ function gameUndo() {
     if (!gGame.isOn || gIsFirstClick || gGameSteps.length === 0) return;
     let lastGameStep = gGameSteps.pop();
     reverseRenderCell(...lastGameStep);
+    undoAudio.play();
 }
 
 function checkUserScore() {
