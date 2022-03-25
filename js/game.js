@@ -96,6 +96,7 @@ function handleFirstClick(cell, i, j) {
     setMinesOnBoard(gBoard);
     setMinesNegsCount(gBoard);
     renderCell({ i: i, j: j }, cell.minesAroundCount);
+    userScore(cell.minesAroundCount);
     gIsFirstClick = false;
 }
 
