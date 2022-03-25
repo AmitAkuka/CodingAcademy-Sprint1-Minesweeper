@@ -66,8 +66,10 @@ function handleClick(event, elCell, i, j) {
 }
 
 function cellClicked(cell, elCell, i, j) {
-    if (cell.isMarked || gIsProcessing) return;
-    else if (gIsFirstClick) handleFirstClick(cell);
+    if (gIsFirstClick) {
+        handleFirstClick(cell, i, j);
+        return;
+    } else if (cell.isMarked || gIsProcessing) return;
     else if (gIsHintClick) {
         checkHint(cell, i, j);
         return;
@@ -86,6 +88,15 @@ function cellClicked(cell, elCell, i, j) {
         if (cell.minesAroundCount === 0) expandShown(gBoard, i, j);
         if ((gLevel.SIZE ** 2 - gLevel.MINE) === gGame.shownCount) checkGameOver(elCell);
     }
+}
+
+function handleFirstClick(cell, i, j) {
+    cell.isShown = true;
+    gGame.shownCount++;
+    setMinesOnBoard(gBoard);
+    setMinesNegsCount(gBoard);
+    renderCell({ i: i, j: j }, cell.minesAroundCount);
+    gIsFirstClick = false;
 }
 
 function expandShown(board, iPos, jPos) {
@@ -197,12 +208,6 @@ function restartGame() {
     initGame();
 }
 
-function handleFirstClick(cell) {
-    cell.isShown = true;
-    setMinesOnBoard(gBoard);
-    setMinesNegsCount(gBoard);
-    gIsFirstClick = false;
-}
 
 function checkUserScore() {
     if (gGame.score > gBestScore || !gBestScore) {
