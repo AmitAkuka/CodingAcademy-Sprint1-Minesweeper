@@ -109,9 +109,10 @@ footer {
     font-weight: bold;
     font-family: cursive;
     position: absolute;
-    width: 275px;
+    width: 290px;
     top: 35%;
-    left: 50%;
+    text-align: center;
+    left: 52%;
     transform: translate(-50%, -50%);
 }
 
