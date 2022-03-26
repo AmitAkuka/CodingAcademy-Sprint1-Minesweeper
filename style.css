@@ -260,3 +260,7 @@ footer {
     font-size: 15px;
     cursor: pointer;
 }
+
+.active-mode {
+    background-color: green;
+}

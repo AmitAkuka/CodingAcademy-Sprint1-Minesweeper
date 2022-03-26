@@ -220,6 +220,7 @@ function restartGame() {
     let elPlayerScore = document.querySelector('.current-score span');
     elPlayerScore.innerText = 0;
     let elSetMinesBtn = document.querySelector('.setmines-click');
+    elSetMinesBtn.classList.remove('active-mode');
     elSetMinesBtn.innerText = 'Set mines manually OFF';
     gGame.shownCount = 0;
     gGame.markedCount = 0;
@@ -291,25 +292,35 @@ function getBestScore() {
     }
 }
 
-function setMinesManually(i, j) {
+function setMinesMode(elSetMinesBtn) {
+    if (!gGame.isOn || gGame.manuallyPlacedMines === gLevel.MINE) return;
     let elMsgContainer = document.querySelector('.game-msg');
-    if (!gGame.isOn || gMinesPosition.length === gLevel.MINE) return;
-    else if (!gIsManualMode) {
+    elSetMinesBtn.classList.toggle('active-mode');
+    if (!gIsManualMode) {
         gIsManualMode = true;
-        let elSetMinesBtn = document.querySelector('.setmines-click');
         elSetMinesBtn.innerText = 'Set mines manually ON';
         elMsgContainer.querySelector('span').innerText = `PLACE ${gLevel.MINE} MINES!`;
         elMsgContainer.style.display = 'block';
-    } else if (gIsManualMode) {
-        if (gUserMinesPositions.includes(`${i}${j}`)) return;
-        gUserMinesPositions.push(`${i}${j}`);
-        gGame.manuallyPlacedMines++;
-        gMinesPosition.push({ i: i, j: j });
-        elMsgContainer.querySelector('span').innerText = `PLACE ${gLevel.MINE-gMinesPosition.length} MINES!`;
-        if (gMinesPosition.length === gLevel.MINE) {
-            elMsgContainer.querySelector('span').innerText = `Time to play!`;
-            setTimeout(() => { elMsgContainer.style.display = 'none'; }, 1500);
-        }
+    } else {
+        gIsManualMode = false;
+        gUserMinesPositions = [];
+        gMinesPosition = [];
+        gGame.manuallyPlacedMines = 0;
+        elSetMinesBtn.innerText = 'Set mines manually OFF';
+        elMsgContainer.style.display = 'none';
+    }
+}
+
+function setMinesManually(i, j) {
+    let elMsgContainer = document.querySelector('.game-msg');
+    if (gUserMinesPositions.includes(`${i}${j}`)) return;
+    gUserMinesPositions.push(`${i}${j}`);
+    gGame.manuallyPlacedMines++;
+    gMinesPosition.push({ i: i, j: j });
+    elMsgContainer.querySelector('span').innerText = `PLACE ${gLevel.MINE-gMinesPosition.length} MINES!`;
+    if (gMinesPosition.length === gLevel.MINE) {
+        elMsgContainer.querySelector('span').innerText = `Time to play!`;
+        setTimeout(() => { elMsgContainer.style.display = 'none'; }, 1500);
     }
 }
 
