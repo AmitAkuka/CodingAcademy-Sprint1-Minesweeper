@@ -1,7 +1,7 @@
 function hintClicked() {
-    if (gGame.hints === 0 || gIsHintClick || !gGame.isOn) return;
+    if (gGame.hints === 0 || gIsHintClick) return;
     let elMsgContainer = document.querySelector('.game-msg');
-    if (gIsFirstClick === true) {
+    if (gIsFirstClick === true || !gGame.isOn) {
         elMsgContainer.querySelector('span').innerText = 'First turn,save your hint!!!';
         elMsgContainer.style.display = 'block';
         setTimeout(() => {

@@ -40,7 +40,6 @@ function initGame() {
     renderBoard(gBoard, '.game-table');
     document.querySelector('.game-timer').innerText = '00:00';
     getBestScore();
-    gGame.isOn = true;
 }
 
 function buildBoard() {
@@ -64,6 +63,7 @@ function buildBoard() {
 }
 
 function handleClick(event, elCell, i, j) {
+    gGame.isOn = true;
     let cell = gBoard[i][j];
     if (!gGame.isOn || cell.isShown) return;
     let startTS = Date.now();
@@ -293,7 +293,8 @@ function getBestScore() {
 }
 
 function setMinesMode(elSetMinesBtn) {
-    if (!gGame.isOn || gGame.manuallyPlacedMines === gLevel.MINE) return;
+    //if user placed 1 mine the game isOn state is true, user cannot turn off manually mode!
+    if (gGame.isOn || gGame.manuallyPlacedMines === gLevel.MINE) return;
     let elMsgContainer = document.querySelector('.game-msg');
     elSetMinesBtn.classList.toggle('active-mode');
     if (!gIsManualMode) {
