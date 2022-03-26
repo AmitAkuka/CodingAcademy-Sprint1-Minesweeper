@@ -7,6 +7,7 @@ const WIN_BUU = 'img/winningBuu.png';
 const ANGRY_BUU = 'img/angryBuu.png';
 const MARK = '🚩';
 const undoAudio = new Audio('sound/gokuTeleport.mp3');
+const winAudio = new Audio('sound/goku-kamehameha.mp3');
 
 let gIsFirstClick = true;
 let gIsHintClick = false;
@@ -186,8 +187,11 @@ function checkGameOver() {
     let elMsgContainer = document.querySelector('.game-msg');
     let elRestartContainer = document.querySelector('.restart-game');
     if (gLevel.MINE === gGame.markedCount && (gLevel.SIZE ** 2 - gLevel.MINE) === gGame.shownCount) {
+        let elSpiritBomb = document.querySelector('.spiritbomb-goku');
+        elSpiritBomb.classList.add('show-spiritbomb');
         gGame.isOn = false;
         checkUserScore();
+        winAudio.play();
         elMsgContainer.querySelector('span').innerText = 'YOU WON!';
         elMsgContainer.style.display = 'block';
         elRestartContainer.src = WIN_BUU;
@@ -222,6 +226,8 @@ function restartGame() {
     let elSetMinesBtn = document.querySelector('.setmines-click');
     elSetMinesBtn.classList.remove('active-mode');
     elSetMinesBtn.innerText = 'Set mines manually OFF';
+    let elSpiritBomb = document.querySelector('.spiritbomb-goku');
+    elSpiritBomb.classList.remove('show-spiritbomb');
     gGame.shownCount = 0;
     gGame.markedCount = 0;
     gGame.secsPassed = 0;

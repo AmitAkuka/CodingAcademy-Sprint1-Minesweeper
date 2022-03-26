@@ -148,6 +148,14 @@ footer {
     left: 270px;
     width: 160px;
     top: 280px;
+    transition: opacity 3s ease-out;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.show-spiritbomb {
+    opacity: 1;
+    visibility: visible;
 }
 
 .game-info {
