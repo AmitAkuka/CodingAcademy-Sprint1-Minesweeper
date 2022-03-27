@@ -24,19 +24,20 @@ let gLevel = {
     MINE: 2
 }
 
-let gGame = {
-    isOn: false,
-    shownCount: 0,
-    markedCount: 0,
-    secsPassed: 0,
-    lives: 3,
-    hints: 3,
-    score: 0,
-    safeClick: 3,
-    manuallyPlacedMines: 0
-}
+let gGame;
 
 function initGame() {
+    gGame = {
+        isOn: false,
+        shownCount: 0,
+        markedCount: 0,
+        secsPassed: 0,
+        lives: 3,
+        hints: 3,
+        score: 0,
+        safeClick: 3,
+        manuallyPlacedMines: 0
+    }
     gBoard = buildBoard();
     renderBoard(gBoard, '.game-table');
     document.querySelector('.game-timer').innerText = '00:00';
@@ -228,14 +229,6 @@ function restartGame() {
     elSetMinesBtn.innerText = 'Set mines manually OFF';
     let elSpiritBomb = document.querySelector('.spiritbomb-goku');
     elSpiritBomb.classList.remove('show-spiritbomb');
-    gGame.shownCount = 0;
-    gGame.markedCount = 0;
-    gGame.secsPassed = 0;
-    gGame.lives = 3;
-    gGame.hints = 3;
-    gGame.safeClick = 3;
-    gGame.score = 0;
-    gGame.manuallyPlacedMines = 0;
     document.querySelector('.safe-click span').innerText = gGame.safeClick;
     gGameSteps = [];
     gMinesPosition = [];
